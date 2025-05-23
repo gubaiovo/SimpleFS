@@ -147,9 +147,9 @@ public:
             std::string files = "";
             for (const auto& entry : fs::directory_iterator(dirPath)) {
                 if (entry.is_directory()) {
-                    dirs += "    Dir: " + std::string(entry.path().filename()) + "\n";
+                    dirs += "    Dir: " + entry.path().filename().string()  + "\n";
                 } else if (entry.is_regular_file()) {
-                    files += "    File: " + std::string(entry.path().filename()) + "\n";
+                    files += "    File: " + entry.path().filename().string()  + "\n";
                 }
             }
             result += dirs + files;
