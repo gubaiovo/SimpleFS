@@ -7,7 +7,6 @@
 
 namespace fs = std::filesystem;
 
-
 class Logger {
 private:
     std::ofstream logfile;
@@ -144,25 +143,7 @@ public:
         }
     }
     
-    // ls
-    std::string listDir(const std::string& dirPath = ".") const {
-        try {
-            std::string result = "\n";
-            std::string dirs = "";
-            std::string files = "";
-            for (const auto& entry : fs::directory_iterator(dirPath)) {
-                if (entry.is_directory()) {
-                    dirs += "    Dir: " + entry.path().filename().string()  + "\n";
-                } else if (entry.is_regular_file()) {
-                    files += "    File: " + entry.path().filename().string()  + "\n";
-                }
-            }
-            result += dirs + files;
-            return result;
-        } catch (const fs::filesystem_error& e) {
-            return "Error listing directory: " + std::string(e.what());
-        }
-    }
+
 };
 
 class FSOp : public FileOp, public DirOp {
@@ -217,6 +198,25 @@ public:
             return "Error copying file: " + std::string(e.what());
         }
     }
+    // ls
+    std::string listDir(const std::string& dirPath = ".") const {
+        try {
+            std::string result = "\n";
+            std::string dirs = "";
+            std::string files = "";
+            for (const auto& entry : fs::directory_iterator(dirPath)) {
+                if (entry.is_directory()) {
+                    dirs += "    Dir: " + entry.path().filename().string()  + "\n";
+                } else if (entry.is_regular_file()) {
+                    files += "    File: " + entry.path().filename().string()  + "\n";
+                }
+            }
+            result += dirs + files;
+            return result;
+        } catch (const fs::filesystem_error& e) {
+            return "Error listing directory: " + std::string(e.what());
+        }
+    }
 };
 
 std::vector<std::string> splitCommand(const std::string& command) {
@@ -234,7 +234,7 @@ std::vector<std::string> splitCommand(const std::string& command) {
     return args;
 }
 
-void clearScreen() {
+void cl() {
     #ifdef _WIN32
         system("cls");
     #else
@@ -242,8 +242,9 @@ void clearScreen() {
     #endif
 }
 
-void printHelp() {
+void help() {
     std::cout << "\n    FileSystem commands:" << std::endl;
+    std::cout << "        help - display this help message" << std::endl;
     std::cout << "        mkdir <directory_name> - create a new directory" << std::endl;
     std::cout << "        touch <file_name> - create a new file" << std::endl;
     std::cout << "        ls [directory_path] - list files and directories in the current or specified directory" << std::endl;
@@ -254,7 +255,7 @@ void printHelp() {
     std::cout << "        mv <source_file> <destination_file> - move a file" << std::endl;
     std::cout << "        pwd - display the current directory" << std::endl;
     std::cout << "        clear - clear the screen" << std::endl;
-    std::cout << "        exit - exit the program\n" << std::endl;
+    std::cout << "        q - exit the program\n" << std::endl;
 }
 
 int main() {
@@ -267,7 +268,7 @@ int main() {
             break;
         }
 
-        if (command == "exit") {
+        if (command == "q") {
             logger.log("Exiting program", "");
             break;
         }
@@ -332,9 +333,9 @@ int main() {
         } else if (args[0] == "pwd") {
             logger.log(FSOp.getPath(), "info");
         } else if (args[0] == "clear") {
-            clearScreen();
+            cl();
         } else if (args[0] == "help") {
-            printHelp();
+            help();
         } else {
             logger.log("Unknown command: " + args[0], "error");
         }
